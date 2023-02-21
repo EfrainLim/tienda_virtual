@@ -1,0 +1,10 @@
+{% autoescape off %}
+
+Hola {{user.first_name}},
+
+Haga clic en el siguiente enlace para confirmar su registro.
+http://{{domain}}{% url 'activate' uidb64=uid token=token %}
+
+Si cree que no es usted, ignore este correo electrónico.
+
+{% endautoescape %}

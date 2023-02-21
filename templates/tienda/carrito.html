@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenido %}
+
+
+<section class="section-content padding-y bg">
+	<div class="container">
+
+		<!-- ============================ COMPONENT 1 ================================= -->
+		{% if not carro_items %}
+		<h2 class="text-center">Tu carrito de compras está vacío</h2>
+		<br>
+		<div class="text-center">
+			<a href="{% url 'tienda' %}" class="btn btn-primary">Seguir comprando</a>
+		</div>
+		{% else %}
+		<div class="row">
+			<aside class="col-lg-9">
+				<div class="card">
+					<table class="table table-borderless table-shopping-cart">
+						<thead class="text-muted">
+							<tr class="small text-uppercase">
+								<th scope="col">producto</th>
+								<th scope="col" width="120">Cantidad</th>
+								<th scope="col" width="120">precio</th>
+								<th scope="col" class="text-right" width="200"> </th>
+							</tr>
+						</thead>
+						<tbody>
+
+							{% for carro_item in carro_items %}
+							<tr>
+								<!-- parte imagen producto -->
+								<td>
+									<figure class="itemside align-items-center">
+										<div class="aside"><img src="{{carro_item.producto.imagenes.url }}"
+												class="img-sm">
+										</div>
+										<figcaption class="info">
+											<a href="{{ carro_item.producto.get_url }}" class="title text-dark">
+												{{carro_item.producto.nombre_producto }}</a>
+											<p class="text-muted small">
+												{% if carro_item.variaciones.all %}
+													{% for item in carro_item.variaciones.all %}
+														{{ item.variacion_categoria | capfirst }} : {{ item.variacion_valor | capfirst }} <br>
+													{% endfor %}
+												{% endif %}
+											</p>
+										</figcaption>
+									</figure>
+								</td>
+								<!-- parte aumentar y desminuir productos -->
+								<td>
+									<!-- col.// -->									
+									<div class="col">
+										<div class="input-group input-spinner">
+											<div class="input-group-prepend">
+												<a href="{% url 'eliminar_carro' carro_item.producto.id carro_item.id %}"
+													class="btn btn-light" type="button" id="button-plus"> <i
+														class="fa fa-minus"></i> </a>
+											</div>
+											<input type="text" class="form-control" value="{{ carro_item.cantidad }}">
+											<div class="input-group-append">
+												<form action="{% url 'agregar_carro' carro_item.producto.id %}" method="POST">
+													{% csrf_token %}
+													{% for item in carro_item.variaciones.all %}
+													<input type="hidden" name="{{ item.variacion_categoria | lower }}"
+														value="{{ item.variacion_valor | capfirst }}">
+													{% endfor %}
+													<button class="btn btn-light" type="submit" id="button-minus"> <i
+															class="fa fa-plus"></i> </button>
+												</form>
+											</div>
+										</div> <!-- input-group.// -->
+									</div> <!-- col.// -->
+								</td>
+								<!-- parte de precio -->
+								<td>
+									<div class="price-wrap">
+										<var class="price">S/. {{ carro_item.sub_total }}</var>
+										<small class="text-muted"> S/. {{ carro_item.producto.precio }} each </small>
+									</div> <!-- price-wrap .// -->
+								</td>
+								<!-- parte boton eliminar -->
+								<td class="text-right">
+									<a href="{% url 'eliminar_item_carro' carro_item.producto.id carro_item.id %}"
+										onclick="return confirm('¿Seguro que quieres quitar este elemento?')"
+										class="btn btn-danger"> Eliminar</a>
+								</td>
+							</tr>
+							{% endfor %}
+
+						</tbody>
+					</table>
+				</div> <!-- card.// -->
+
+			</aside> <!-- col.// -->
+			<aside class="col-lg-3">
+
+				<div class="card">
+					<div class="card-body">
+						<dl class="dlist-align">
+							<dt>Productos:</dt>
+							<dd class="text-right">S/. {{total}}</dd>
+						</dl>
+						<dl class="dlist-align">
+							<dt>Impuesto:</dt>
+							<dd class="text-right"> S/. {{tax}}</dd>
+						</dl>
+						<dl class="dlist-align">
+							<dt>Total General:</dt>
+							<dd class="text-right text-dark b"><strong>$ {{total_general}}</strong></dd>
+						</dl>
+						<hr>
+						<p class="text-center mb-3">
+							<img src="{% static './images/misc/payments.png' %}" height="26">
+						</p>
+						<a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Comprar ahora</a>
+						<a href="{% url 'tienda' %}" class="btn btn-light btn-block">Continuar comprando</a>
+					</div> <!-- card-body.// -->
+				</div> <!-- card.// -->
+
+			</aside> <!-- col.// -->
+
+
+		</div> <!-- row.// -->
+		{% endif %}
+		<!-- ============================ COMPONENT 1 END .// ================================= -->
+
+	</div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}
